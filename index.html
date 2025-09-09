@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Useful Links</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://framerusercontent.com/images/fEaBvmmjAy73dhE5FHsSZMeVptw.png') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .login-container, .container {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 30px 40px;
+      max-width: 800px;
+      width: 100%;
+      margin: 100px auto;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #2c3e50;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    /* ✅ Top bar for Time & Logout */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .time-display {
+      font-size: 14px;
+      color: #333;
+      font-weight: bold;
+    }
+    .logout-btn {
+      padding: 6px 14px;
+      background: #ff4d4d;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .logout-btn:hover {
+      background: #cc0000;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      border: 1px solid #dcdfe3;
+      padding: 12px;
+      text-align: left;
+      transition: all 0.3s ease;
+    }
+
+    th {
+      background-color: #0077cc;
+      color: #ffffff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f8fc;
+    }
+
+    td:hover {
+      background-color: #eaf4ff;
+      transform: scale(1.02);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      cursor: pointer;
+    }
+
+    a {
+      color: #0077cc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+
+    input[type="text"], input[type="password"], #searchInput {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 10%;
+      padding: 10px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      margin-top: -10px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .forgot-link a {
+      color: #0077cc;
+    }
+
+    .forgot-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* ✅ Uniform size for all table dropdowns */
+    #linksTable select {
+      width: 200px;
+      height: 24px;
+      font-size: 14px;
+      padding: 4px;
+      border-radius: 5px;
+    }
+	.logo {
+      height: 60px; display: block;
+      margin: 0 auto 20px auto;
+    }
+    .logo-small {
+      height: 40px; margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Section -->
+  <div id="loginPage" class="login-container">
+    <img src="https://mms.businesswire.com/media/20200309005481/en/778418/4/GO_White_Vertical.jpg" alt="Logo" class="logo">
+    <h1>Login</h1>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <div class="forgot-link">
+        <a href="#" onclick="forgotPassword()">Forgot Password?</a>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <!-- Main Content Section -->
+  <div id="mainPage" class="container" style="display:none">
+    <!-- Top Bar with Logo, Time & Logout -->
+    <div class="top-bar">
+      <div style="display:flex; align-items:center;">
+        <img src="https://mms.businesswire.com/media/20200309005481/en/778418/4/GO_White_Vertical.jpg" alt="Logo" class="logo-small">
+        <div class="time-display" id="timeDisplay"></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <h1>QA Greyorange Repository</h1>
+
+    <!-- Search Bar -->
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Type to search...">
+
+    <table id="linksTable">
+      <thead>
+        <tr>
+          <th>Sr. No.</th>
+          <th>Table Name</th>
+          <th>Link</th>
+          <th>Remark</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ⚡ Your table rows stay SAME (no change) -->
+        <!-- Example row -->
+		<tr>
+          <td>1</td>
+          <td>
+            <div>
+              <div style="font-weight:bold; margin-bottom:5px;">QA Performance</div>
+              <select onchange="updateLink(this.value, 1)">
+                <option value="">--Select--</option>
+                <option value="https://docs.google.com/spreadsheets/d/e/2PACX-1vSknaagKjqhvUzargZRHQy0XbAgArWhyY7pizWBtNDS0ricQ4gRHQSH8Vyk6uug2ZVhX1yyI98Ah__o/pubhtml">QA Performance Tracker All in One</option>
+                <option value="Link2">Option</option>
+                <option value="Link3">Option</option>
+                <option value="https://example.com/spare">Option</option>
+                <option value="https://example.com/failure">Option</option>
+              </select>
+            </div>
+          </td>
+          <td id="linkCell1"></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>
+            <div>
+              <div style="font-weight:bold; margin-bottom:5px;">Important Links</div>
+              <select onchange="updateLink(this.value, 2)">
+                <option value="">--Select--</option>
+                <option value="https://docs.google.com/spreadsheets/d/1-WqnRNY_zTvLEQgALrbvUorz-PAK5KS3wOOjUIy9VEw/edit?gid=1663299494#gid=1663299494">Power BI Sheet</option>
+                <option value="https://docs.google.com/spreadsheets/d/1IK8Q69wv8VZ1gbE5noSqu0a5Oms8CjOj_QU5avWctIw/edit?gid=1642582891#gid=1642582891">ECN List</option>
+                <option value="https://docs.google.com/spreadsheets/d/1RzgPyKWlL-pe-uRS6w4Ez5ffVSGRXy_k/edit?gid=897831567#gid=897831567">Swing arm(Flange bearing)</option>
+                <option value="https://example.com/spare">Option</option>
+                <option value="https://example.com/failure">Option</option>
+              </select>
+            </div>
+          </td>
+          <td id="linkCell2"></td>
+          <td></td>
+        </tr>
+
+        <tr>
+          <td>3</td>
+            <td>
+            <div>
+              <div style="font-weight:bold; margin-bottom:5px;">SOPs & Manuals Repository</div>
+              <select onchange="updateLink(this.value, 3)">
+                <option value="">--Select the Product--</option>
+                <option value="https://docs.google.com/spreadsheets/d/1AGDz4kLQQc2VnYIeHkUvZGOBwYZ5HBgz038E8gdebuk/edit?gid=0#gid=0">RTP BoT(3.0)</option>
+                <option value="https://example.com/spare">RIL BoT</option>
+                <option value="https://example.com/failure">Charger</option>
+              </select>
+            </div>
+          </td>
+          <td id="linkCell3"></td>
+          <td></td>
+        </tr>
+
+        <!-- FAT for ICU row -->
+        <tr>
+          <td>4</td>
+          <td>
+            <div>
+              <div style="font-weight:bold; margin-bottom:5px;">Project Aritzia</div>
+              <select onchange="updateLink(this.value, 4)">
+                <option value="">-- Select --</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/EpHjqf_5omlMunblJ7RBFyEBcPO10D7a8o11sODp7fxW7Q?e=wdJqkv">ICU </option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/EucUhmc9qMtKp2rOZFQ-8_QBAF68PS5HIhiJvpnhYCnCbw?e=hYx1rB">MSU</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/EoUn3Vlq871ElOy_aHQSNUkBalFri5l9Fg4znM-hiyYngA?e=AdE7OJ">PPS</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/EqRWm1ZUmKVHjQ50bULB6x4BNBuWbGrel6_FCh2oUhzz4A?e=GtaD17">Spare</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/Eueiu9-ss5hItXkw1Ws_hQoBxIKnTflis6CNXoM0jEE4JA?e=L9EiBI">Failure</option>
+				<option value="https://docs.google.com/spreadsheets/d/e/2PACX-1vTCu0I9hwqeG5sj9QEKdrE5SSbHRgK95myy52BL7KV7aQJq6veQoI8FJ_3PsRBwRcNY1oIBDk9Kqsf5/pubhtml">Master sheet for Aritzia</option>
+              </select>
+            </div>
+          </td>
+          <td id="linkCell4"></td>
+          <td></td>
+        </tr>
+
+        <!-- FAT for MSU -->
+        <tr>
+          <td>5</td>
+          <td>
+            <div>
+              <div style="font-weight:bold; margin-bottom:5px;">Project Apotek</div>
+              <select onchange="updateLink(this.value, 5)">
+                <option value="">-- Select --</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/EvjKWmsHvcxOovmupZxfLzEBDrOr5FMFlZREvXCDe3J7og?e=mOyzE3">ICU</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/Eh4nTuyghVxApJzWBOq4BmsBb7MJDXDj6rLp3UbM466BTQ?e=e87PDK">MSU</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/Eobu3L5Sgl9DudNNrDmz4LMBJNSo-FBYGiS0oYbQBFhDEA?e=rJqzvS">PPS</option>
+				<option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/Esx4DbgS1M9Kovt9M8R6zCABcF2HwSGuMt2kOFRlY4L0HQ?e=XLhVzG">Spare</option>
+				<option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/El2ltBm7S1lDveYsh6Os3vEBQPi7iagDAY_EUofkmAIc8Q?e=Pfacgn">Failure</option>
+              </select>
+            </div>
+          </td>
+          <td id="linkCell5"></td>
+          <td></td>
+        </tr>
+
+        <!-- FAT for PPS -->
+        <tr>
+          <td>6</td>
+          <td>
+            <div>
+              <div style="font-weight:bold; margin-bottom:5px;">Project Sam's ATL & LAX</div>
+              <select onchange="updateLink(this.value, 6)">
+                <option value="">-- Select --</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/EpA5ZBE4-T1FioBTo2_CFPQBj5wau4mHoIfMkqHEXpTzgg?e=KYCV4G">ICU</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/EnKN7HEwnoRKoOXUQnAmcQUBsXvh11NlTBZLK7A7tWFIPg?e=Npkn17">MSU</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/EtEa7yZ_qcRMgeCbgSd54HkBvqzbBkT8jWsrEY8CQAqysQ?e=jaiifN">PPS</option>
+			    <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/Eq0xYf1wuZ1Pnfa083TZ9qUB52acgZzA0NmXwCIzYsttbg?e=gkDFOH">Spare</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/EkjggEodToNCp5d5gG174cwB_oo6ccs9pi2ScZujaGTlMg?e=iP5p5M">Failure</option>
+              </select>
+            </div>
+          </td>
+          <td id="linkCell6"></td>
+          <td></td>
+        </tr>
+		<tr>
+		 <tr>
+          <td>7</td>
+          <td>
+            <div>
+              <div style="font-weight:bold; margin-bottom:5px;">Project SNOP</div>
+              <select onchange="updateLink(this.value, 7)">
+                <option value="">-- Select --</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/Elypdy8tQiNJgMJ9lAnwQ8cB3WtdaxkzgqIoc8RVRRZA9A?e=EvwM4D">ICU</option>
+                <option value="Link2">MSU</option>
+                <option value="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/Er9c2gbwxsFNrE8WLkIenFcBJnr3DfjUSmmOF2yFwDbrfg?e=neZiWB">PPS</option>
+			    <option value="Link4">Spare</option>
+                <option value="Link5">Failure</option>
+              </select>
+            </div>
+          </td>
+          <td id="linkCell7"></td>
+          <td></td>
+        </tr>
+		<tr>
+          <td>8</td>
+          <td>
+            <div>
+              <div style="font-weight:bold; margin-bottom:5px;">GFC-2 Refurbishment</div>
+              <select onchange="updateLink(this.value, 8)">
+                <option value="">-- Select --</option>
+                <option value="http://192.168.5.70:8087/#/map">Tower</option>
+                <option value="http://192.168.5.73:3002/d/000000jj04hh6/gfc-butler-health-dashboard?orgId=1">Grafana</option>
+                <option value="http://192.168.5.70/diag_reports/">Diagnostics Report</option>
+			    <option value="https://docs.google.com/spreadsheets/d/19mcz__CQaP-wCN7cA-Ol8qjObRBddpg2nyixhNrcVs8/edit?gid=210452369#gid=210452369">Testing Data Sheet</option>
+                <option value="https://docs.google.com/document/d/1l60MZV-jQMSu99F-frPsCYgd-5DvbiOi/edit?usp=drivesdk&ouid=117986481208865207632&rtpof=true&sd=true">CMD file</option>
+				<option value="https://docs.google.com/spreadsheets/d/1VheapP2yZ4Vc9ATL5zY3Nr2ChYE_njJEe_HO3HjA_ec/edit?gid=775337867#gid=775337867">Bot Testing Criteria</option>
+              </select>
+            </div>
+          </td>
+          <td id="linkCell8"></td>
+          <td></td>
+        </tr>
+
+        <tr>
+          <td>9</td>
+          <td style="font-weight:bold; margin-bottom:5px;">FAT for Roll cage</td>
+          <td><a href="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/ElA1y7SGAt5Bm4_Cw3k_YV8BhkWjddKalMV41GB-m2wlFw?e=alplxl" target="_blank">Visit</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td style="font-weight:bold; margin-bottom:5px;">FAT for STP</td>
+          <td><a href="https://greyorangeindiapvtltd-my.sharepoint.com/:f:/g/personal/shivam_k_greyorange_com/Em2sDqIKKNNPh-fncH5MxR4B3UBEOzsCyKJxAfhKd5e_ww?e=SmSVUk" target="_blank">Visit</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td style="font-weight:bold; margin-bottom:5px;">QC drive data</td>
+          <td><a href="https://docs.google.com/spreadsheets/d/1G2EXjFPQ-w8tr2oQnUrg-emPIuzWjtoJ_g_O3TbebyU/edit?gid=0#gid=0" target="_blank">Visit</a></td>
+          <td></td>
+        </tr>
+
+        <!-- ⚡ Aapke dusre sare rows same rahenge (maine yaha shorten kiya hai) -->
+
+      </tbody>
+    </table>
+
+    <div class="footer">
+      Prepared by: <strong>Kadir Tyagi</strong>
+    </div>
+  </div>
+
+  <script>
+    // ✅ Login Function
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (username === "admin" && password === "1234") {
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("mainPage").style.display = "block";
+      } else {
+        alert("❌ Invalid username or password!");
+      }
+    });
+
+    // ✅ Logout Function
+    function logout() {
+      document.getElementById("mainPage").style.display = "none";
+      document.getElementById("loginPage").style.display = "block";
+      document.getElementById("loginForm").reset();
+    }
+
+    // ✅ Forgot Password Function
+    function forgotPassword() {
+      alert("🔑 Forgot Password:\nDefault Username: admin\nDefault Password: 1234\n(You can change this in the script)");
+    }
+
+    // ✅ Search Function
+    function searchTable() {
+      let input = document.getElementById("searchInput").value.toLowerCase();
+      let table = document.getElementById("linksTable");
+      let rows = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < rows.length; i++) {
+        let cells = rows[i].getElementsByTagName("td");
+        let match = false;
+
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerText.toLowerCase().includes(input)) {
+            match = true;
+            break;
+          }
+        }
+        rows[i].style.display = match ? "" : "none";
+      }
+    }
+
+    // ✅ Dropdown Link Update Function
+    function updateLink(url, rowId) {
+      let cell = document.getElementById("linkCell" + rowId);
+      if (url) {
+        cell.innerHTML = '<a href="' + url + '" target="_blank">Visit</a>';
+      } else {
+        cell.innerHTML = '';
+      }
+    }
+
+    // ✅ Time Function
+    function updateTime() {
+      let now = new Date();
+      let options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', 
+                      hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      document.getElementById("timeDisplay").innerText = now.toLocaleDateString("en-US", options);
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+  </script>
+</body>
+</html>
