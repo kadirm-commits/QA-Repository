@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Butler Dashboard</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f6f8fa;
+    padding: 20px;
+    margin: 0;
+  }
+  h2 {
+    color: #333;
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .form-container {
+    margin: 0 auto 20px auto;
+    text-align: center;
+  }
+  input {
+    padding: 8px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 180px;
+    max-width: 90%;
+    font-size: 14px;
+  }
+  button {
+    padding: 8px 14px;
+    margin: 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  .dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+  }
+  .dials {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .dial {
+    width: 100px;
+    height: 100px;
+    background: #fff;
+    border-radius: 50%;
+    border: 6px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  }
+  .dial-inner {
+    text-align: center;
+  }
+  .dial-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #007bff;
+  }
+  .table-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 70vh;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  }
+  #result table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 12px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    text-align: left;
+    padding: 6px 8px;
+  }
+  th {
+    background-color: #007bff;
+    color: white;
+    font-size: 13px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  tr:hover {
+    background-color: #e8f0fe;
+  }
+  #shareableLink a {
+    color: #007bff;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  @media (max-width: 768px) {
+    .dials {
+      flex-direction: column;
+      align-items: center;
+    }
+    .dial {
+      width: 120px;
+      height: 120px;
+    }
+    input, button {
+      width: 140px;
+      font-size: 13px;
+    }
+    .table-container {
+      max-height: 60vh;
+    }
+  }
+</style>
+</head>
+<body>
+<h2>Butler Error, Barcode & Charger Dashboard (IST)</h2>
+
+<div class="form-container">
+  <label>Bot ID: </label>
+  <input type="text" id="botId" placeholder="e.g. 10570">
+  <br>
+  <label>Start Time (IST): </label>
+  <input type="datetime-local" id="startTime">
+  <label>End Time (IST): </label>
+  <input type="datetime-local" id="endTime" placeholder="Leave blank for now">
+  <br>
+  <button onclick="fetchData()">Fetch Data</button>
+  <button id="toggleRefreshBtn" onclick="toggleAutoRefresh()">Auto Refresh: ON</button>
+  <button onclick="downloadTable()">Download CSV</button>
+  <button onclick="generateLink()">Generate Link</button>
+  <div id="shareableLink" style="margin-top:10px;"></div>
+</div>
+
+<div class="dashboard">
+  <div class="dials">
+    <div class="dial" id="barcodeDial">
+      <div class="dial-inner">
+        <div>Total Barcodes</div>
+        <div class="dial-value" id="barcodeValue">0</div>
+      </div>
+    </div>
+    <div class="dial" id="errorDial">
+      <div class="dial-inner">
+        <div>Total Errors</div>
+        <div class="dial-value" id="errorValue">0</div>
+      </div>
+    </div>
+    <div class="dial" id="autoAttemptDial">
+      <div class="dial-inner">
+        <div>Auto Charge Attempts</div>
+        <div class="dial-value" id="autoAttemptValue">0</div>
+      </div>
+    </div>
+    <div class="dial" id="autoChargeDial">
+      <div class="dial-inner">
+        <div>Auto Charges</div>
+        <div class="dial-value" id="autoChargeValue">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div id="result"></div>
+  </div>
+</div>
+
+<script>
+let autoRefresh = true;
+let refreshInterval;
+let currentColumns = [];
+let currentRows = [];
+
+// Auto-fill from URL
+function loadFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const botId = params.get('botId');
+    const start = params.get('start');
+    const end = params.get('end');
+
+    if (botId) document.getElementById('botId').value = botId;
+    if (start) document.getElementById('startTime').value = start;
+    if (end) document.getElementById('endTime').value = end;
+
+    if (botId && start) fetchData();
+}
+window.onload = loadFromURL;
+
+// Toggle auto refresh
+function toggleAutoRefresh() {
+  autoRefresh = !autoRefresh;
+  const btn = document.getElementById('toggleRefreshBtn');
+  btn.innerText = autoRefresh ? "Auto Refresh: ON" : "Auto Refresh: OFF";
+  if (autoRefresh) startAutoRefresh();
+  else clearInterval(refreshInterval);
+}
+function startAutoRefresh() {
+  clearInterval(refreshInterval);
+  refreshInterval = setInterval(() => { if (autoRefresh) fetchData(); }, 10000);
+}
+
+// Fetch data
+async function fetchData() {
+  const botId = document.getElementById('botId').value.trim();
+  const startTimeIST = document.getElementById('startTime').value;
+  const endTimeInput = document.getElementById('endTime').value.trim();
+
+  if (!botId || !startTimeIST) { alert("Please fill Bot ID and Start Time!"); return; }
+
+  const startUTC = new Date(startTimeIST).toISOString();
+  const endUTC = endTimeInput ? new Date(endTimeInput).toISOString() : new Date().toISOString();
+
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = "<p style='text-align:center;'>Fetching data...</p>";
+
+  try {
+    // Error Data
+    const errorQuery = `
+      SELECT "butler_id", "error" AS "butler_nav_error.error", "error_flag" AS "butler_nav_error.error_flag",
+      "expected_barcode" AS "butler_nav_error.expected_barcode", "old_barcode" AS "butler_nav_error.old_barcode",
+      "direction" AS "butler_nav_error.direction", "time"
+      FROM "butler_nav_error"
+      WHERE "butler_id"='${botId}' AND time >= '${startUTC}' AND time <= '${endUTC}'
+      ORDER BY time DESC`;
+    const errorUrl = `http://10.1.10.201:8086/query?db=GreyOrange&q=${encodeURIComponent(errorQuery)}`;
+    const errorData = await (await fetch(errorUrl)).json();
+
+    // Barcode Data
+    const barcodeQuery = `
+      SELECT count("value") AS "Total Barcodes Traveled"
+      FROM "butler_step_logs"
+      WHERE "butler_id"='${botId}' AND time >= '${startUTC}' AND time <= '${endUTC}'
+      GROUP BY "butler_id"`;
+    const barcodeUrl = `http://10.1.10.201:8086/query?db=gmc&q=${encodeURIComponent(barcodeQuery)}`;
+    const barcodeData = await (await fetch(barcodeUrl)).json();
+
+    let totalBarcodes = 0;
+    if (barcodeData.results && barcodeData.results[0].series)
+      totalBarcodes = barcodeData.results[0].series[0].values[0][1];
+    document.getElementById('barcodeValue').innerText = totalBarcodes;
+
+    // Process Errors
+    let totalErrors = 0;
+    let rows = [], columns = [];
+    if (errorData.results && errorData.results[0].series) {
+      rows = errorData.results[0].series[0].values;
+      columns = errorData.results[0].series[0].columns;
+      const botIndex = columns.indexOf("butler_id");
+      if (botIndex>-1){ columns.splice(botIndex,1); rows=rows.map(r=>{let nr=[...r]; nr.splice(botIndex,1); return nr;}); }
+      columns.push("Error Count"); totalErrors=rows.length;
+    }
+    document.getElementById('errorValue').innerText = totalErrors;
+    currentColumns = columns; currentRows = rows;
+
+    // Render Table
+    let html="<table><tr>"; columns.forEach(c=>html+=`<th>${c}</th>`); html+="</tr>";
+    rows.forEach((row,index)=>{ html+="<tr>"; row.forEach((val,idx)=>{ 
+        html+=`<td>${columns[idx]==="time"? new Date(val).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"}):val}</td>`;
+    }); html+=`<td>${index+1}</td>`; html+="</tr>"; });
+    html+="</table>"; resultDiv.innerHTML=html;
+
+    // Charger Events
+    const chargerQuery = `
+      SELECT "name", "ampere_hours_pushed"
+      FROM "charger_events"
+      WHERE "butler_id"='${botId}' AND time >= '${startUTC}' AND time <= '${endUTC}'
+      ORDER BY time DESC`;
+    const chargerUrl = `http://10.1.10.201:8086/query?db=GreyOrange&q=${encodeURIComponent(chargerQuery)}`;
+    const chargerData = await (await fetch(chargerUrl)).json();
+
+    let autoAttempts=0, autoCharges=0;
+    if(chargerData.results && chargerData.results[0].series){
+      const cRows=chargerData.results[0].series[0].values;
+      const cCols=chargerData.results[0].series[0].columns;
+      const nameIndex=cCols.indexOf("name"), ampIndex=cCols.indexOf("ampere_hours_pushed");
+      cRows.forEach(row=>{
+        const name=row[nameIndex], amp=row[ampIndex];
+        if(name==="mode_auto"||name==="charge_contactor_on_ack") autoAttempts++;
+        if(name==="charge_cycle_data"&&amp>0) autoCharges++;
+      });
+    }
+    document.getElementById('autoAttemptValue').innerText=autoAttempts;
+    document.getElementById('autoChargeValue').innerText=autoCharges;
+
+  } catch(err){
+    console.error(err);
+    resultDiv.innerHTML="<p style='text-align:center;color:red;'>Error fetching data. Check CORS or InfluxDB connection.</p>";
+  }
+}
+
+// CSV Download
+function downloadTable(){
+  if(!currentColumns.length||!currentRows.length){ alert("No data to download!"); return; }
+  let csv=currentColumns.join(",")+"\n";
+  currentRows.forEach((row,index)=>{
+    const rowData=row.map((val,idx)=>currentColumns[idx]==="time"? `"${new Date(val).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"})}"`:`"${val}"`);
+    rowData.push(`"${index+1}"`);
+    csv+=rowData.join(",")+"\n";
+  });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url;
+  a.download=`error_data_${new Date().toISOString()}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+// Generate Shareable Link
+function generateLink(){
+  const botId=document.getElementById('botId').value.trim();
+  const start=document.getElementById('startTime').value;
+  const end=document.getElementById('endTime').value;
+  if(!botId||!start){ alert("Bot ID और Start Time डालें ताकि लिंक बन सके"); return; }
+  const url=`${window.location.origin}${window.location.pathname}?botId=${botId}&start=${start}&end=${end}`;
+  document.getElementById('shareableLink').innerHTML=`<a href="${url}" target="_blank">Click to view data for Bot ${botId}</a>`;
+}
+
+startAutoRefresh();
+</script>
+</body>
+</html>
